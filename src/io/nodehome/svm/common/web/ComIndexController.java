@@ -19,9 +19,4 @@ public class ComIndexController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ComIndexController.class);
 	private LocaleResolver localeResolver;
 
-	@RequestMapping("/index")
-	public String mypage(HttpServletRequest request, HttpServletResponse response, ModelMap model) throws UnknownHostException, IOException {
-		System.out.println("***************** wid : " +request.getParameter("wid"));
-		return "/index";
-	}
 }
