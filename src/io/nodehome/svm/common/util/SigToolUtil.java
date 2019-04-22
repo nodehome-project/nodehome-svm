@@ -16,14 +16,21 @@ public class SigToolUtil {
 
 	// Generate Key
 	public String getGenerateKey() throws Exception {
-		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=newKey -netID=0xEF");
+		String netID = "0xEF";
+		String project_net = GlobalProperties.getProperty("project_net");
+		if(project_net.equals("DEBUGNET")) netID = "0xDE";
+		if(project_net.equals("MAINNET")) netID = "0x80";
+		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=newKey -netID="+netID+"");
 		return returnStr;
 	}
 	
 	// Verify Signature
 	public String getVerifySignature(String inputString, String pubk, String sig) throws Exception {
-		// Example : /sigtool -cmd=verify -netID=0xEF -input=\"fimusic\" -pubKey=cMgcR49dvEfUrrp6gPSJFbe394SB2JNK2a9q4izbNj29jq8B5RLP -signature=381yXYhuSvV13BQnBHFsSYRbMGgKpFZrWNUi7jMx38h9c3scVGzFnN4oMnPknL689465GRNc4X1MPde7anG3KCUM2v47dWZ4
-		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=verify -netID=0xEF -input=\""+inputString+"\" -pubKey="+pubk+" -signature="+sig+"");
+		String project_net = GlobalProperties.getProperty("project_net");
+		String netID = "0xEF";
+		if(project_net.equals("DEBUGNET")) netID = "0xDE";
+		if(project_net.equals("MAINNET")) netID = "0x80";
+		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=verify -netID="+netID+" -input=\""+inputString+"\" -pubKey="+pubk+" -signature="+sig+"");
 		return returnStr;
 	}
 
@@ -44,7 +51,11 @@ public class SigToolUtil {
 
 	// Recover Key
 	public String getRecoverKey(String mnemonicWords) throws Exception {
-		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=import -netID=0xEF -mnemonicWords='"+mnemonicWords+"'");
+		String netID = "0xEF";
+		String project_net = GlobalProperties.getProperty("project_net");
+		if(project_net.equals("DEBUGNET")) netID = "0xDE";
+		if(project_net.equals("MAINNET")) netID = "0x80";
+		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=import -netID="+netID+" -mnemonicWords='"+mnemonicWords+"'");
 		return returnStr;
 	}
 	
