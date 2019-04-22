@@ -24,5 +24,4 @@ public class ComIndexController {
 		System.out.println("***************** wid : " +request.getParameter("wid"));
 		return "/index";
 	}
-
 }

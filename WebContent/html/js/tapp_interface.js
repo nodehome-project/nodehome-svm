@@ -98,6 +98,26 @@ function AWI_getConfig(strName) {
 	return joReturn['value'];
 }
 
+//Information setting
+function AWI_setAccountConfig(strName,strValue) {
+	if(!AWI_ENABLE) return;
+	var joCmd = null;
+	var params = new Object();
+	params['cmd'] = "setAccountConfig";
+	params['key'] = strName;
+	params['value'] = strValue;
+	joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+	var joReturn = JSON.parse(sReturn);
+	return joReturn['result'];
+}
+
 //And inquires the setting information value set in the phone.
 function AWI_getAccountConfig(strName) {
 	var sReturn = "{ \"result\":\"FAIL\", \"value\":\"\" }"
@@ -138,6 +158,26 @@ function AWI_checkPassword(strPW) {
 	return joReturn['result'];
 }
 
+// Save your new password to phone
+function AWI_setPassword(strPW) {
+	var sReturn = "{ \"result\":\"FAIL\", \"value\":\"\" }"
+	if(!AWI_ENABLE) return "";
+	var joCmd = null;
+	var params = new Object();
+	params['cmd'] = "setPassword";
+	params['password'] = strPW;
+	joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+	var joReturn = JSON.parse(sReturn); // { "result":"OK", "value":true }
+	return joReturn['result'];
+}
+
 // Request to check data in terminal node.
 function AWI_isSetPassword() {
 	if(!AWI_ENABLE) return;
@@ -154,6 +194,45 @@ function AWI_isSetPassword() {
 	}
 	var joReturn = JSON.parse(sReturn);
 	return joReturn['result'];
+}
+
+//Create a new account
+//sOwner: owner name, same as account name, later account name can be changed
+//By default, 100 coins are created.
+function AWI_newWallet() {
+	var sReturn = "{ \"result\":\"FAIL\" }"
+	if(!AWI_ENABLE) return;
+    var joCmd = null;
+    var params = new Object();
+    params['cmd'] = "newWallet";
+    joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+	return sReturn;
+}
+
+// Request to delete wallet in terminal node. Call backup wallet activtiy to save paper wallet if need it.
+function AWI_deleteWallet(walletId) {
+	var sReturn = "{ \"result\":\"FAIL\" }"
+	if(!AWI_ENABLE) return;
+    var joCmd = null;
+    var params = new Object();
+    params['cmd'] = "deleteWallet";
+    params['walletId'] = walletId;
+    joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+	return sReturn;
 }
 
 //Save account information on mobile phone
@@ -223,7 +302,30 @@ function AWI_getWalletList() {
 	return sReturn;
 }
 
-function AWI_runTransaction(transType, jaArgs, callbackFunc, displayTitle, displayDesc, displayParam, walletId) {
+// Select the service list and save the settings to the terminal.
+function AWI_setServiceList(serviceIds) {
+	var sReturn = "{ \"result\":\"FAIL\" , \"value\":{} }"
+
+	 var jsonObj = $.parseJSON('[' + serviceIds + ']');
+	 var joCmd = null;
+	 var params = new Object();
+	 params['cmd'] = "setServiceList";
+	 params['list'] = jsonObj;
+	 joCmd = {func:params};
+	 
+	if(!AWI_ENABLE) return;
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+	 var joReturn = JSON.parse(sReturn);
+	return joReturn;
+}
+
+function AWI_runTransaction(transType, jaArgs, callbackFunc, displayTitle, displayDesc, displayParam, walletId, fee) {
 	var sReturn = "{ \"result\":\"FAIL\" , \"value\":{} }"
 	if(!AWI_ENABLE) return;
 	var joCmd = null;
@@ -235,6 +337,7 @@ function AWI_runTransaction(transType, jaArgs, callbackFunc, displayTitle, displ
 	params['displayDesc'] = displayDesc;
 	params['displayArgs'] = displayParam;
 	params['walletId'] = walletId;
+	params['displayFee'] = fee;
 	params['args'] = jaArgs;
 	joCmd = {func:params};
 	if(AWI_DEVICE == 'ios') {
@@ -244,6 +347,43 @@ function AWI_runTransaction(transType, jaArgs, callbackFunc, displayTitle, displ
 	} else { // windows
 		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
 	}
+}
+
+//backup
+function AWI_setBackup(walletId) {
+	var sReturn = "{ \"result\":\"FAIL\" }"
+	if(!AWI_ENABLE) return;
+	var joCmd = null;
+	var params = new Object();
+	params['cmd'] = "backup";
+	params['walletId'] = walletId;
+	joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+	return sReturn;
+}
+
+//restore
+function AWI_setRestore(walletId) {
+	var sReturn = "{ \"result\":\"FAIL\" }"
+	if(!AWI_ENABLE) return;
+	var joCmd = null;
+	var params = new Object();
+	params['cmd'] = "restore";
+	joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+	return sReturn;
 }
 
 //showQRCode
@@ -455,11 +595,59 @@ function AWI_getNetID() {
 	return joReturn;
 }
 
+function AWI_setNetID(netID) {
+	if(!AWI_ENABLE) return;
+	 var joCmd = null;
+	 var params = new Object();
+	 params['cmd'] = "setNetID";
+	 params['netID'] = netID;
+	 joCmd = {func:params};
+	 if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	 } else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	 } else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	 }
+}
+
+function AWI_openAppByHost(host) {
+	if(!AWI_ENABLE) return;
+	 var joCmd = null;
+	 var params = new Object();
+	 params['cmd'] = "openAppByHost";
+	 params['host'] = host;
+	 joCmd = {func:params};
+	 if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	 } else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	 } else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	 }
+}
+
 function AWI_showSettingView() {
 	if(!AWI_ENABLE) return;
 	 var joCmd = null;
 	 var params = new Object();
 	 params['cmd'] = "showSettingView";
+	 joCmd = {func:params};
+	 if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	 } else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	 } else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	 }
+}
+
+function AWI_openServiceApp(serviceId) {
+	if(!AWI_ENABLE) return;
+	 var joCmd = null;
+	 var params = new Object();
+	 params['cmd'] = "openServiceApp";
+	 params['serviceId'] = serviceId;
 	 joCmd = {func:params};
 	 if(AWI_DEVICE == 'ios') {
 		sReturn =  prompt(JSON.stringify(joCmd));	

@@ -100,7 +100,7 @@ public class SvmCommonController {
 		JSONObject joResult = null;
 		if(strPID.equals("")) strPID = "PID";
 		if(strVER.equals("")) strPID = "10000";
-		
+
 		if(npid==null || npid.equals(""))
 			joResult = CPWalletUtil.Nonce(serviceId, strCType, strPID, strVER);
 		else
@@ -137,7 +137,6 @@ public class SvmCommonController {
 
 	/*
 	* Generate NONCE for coin trading
-	* Use createTrans, when commitData.
 	* Description: The progress of the other api
 	* step1 getNonce,
 	* step2 getSignature,

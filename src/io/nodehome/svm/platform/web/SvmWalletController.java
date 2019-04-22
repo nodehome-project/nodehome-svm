@@ -42,7 +42,7 @@ public class SvmWalletController {
 		String npid= (String)map.get("npid");
 		String serviceId = StringUtil.nvl(map.get("serviceId"),GlobalProperties.getProperty("project_serviceid"));
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
-		
+		 
 		if(arrArgs!=null) {
 			JSONObject joResult = null;
 

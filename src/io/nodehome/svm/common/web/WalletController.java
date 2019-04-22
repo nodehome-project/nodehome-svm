@@ -30,6 +30,44 @@ public class WalletController {
 	}
 	
 	/*
+	 * Coin Transmission Confirm Page
+	 */
+	@RequestMapping("/svm/wallet/sendCoinConfirm")
+	public String sendCoinConfirm(@RequestBody String map, ModelMap model) throws UnknownHostException, IOException {
+		String requestValue = StringUtil.nvl(URLDecoder.decode(map,"utf-8"));
+		if((requestValue.substring(requestValue.length()-1)).equals("=")) requestValue = requestValue.substring(0, requestValue.length()-1);
+		model.addAttribute("requestValue" ,requestValue);
+		return "svm/wallet/sendCoinConfirm";
+	}
+	
+	/*
+	 * Coin Transmission Complete Page
+	 */
+	@RequestMapping("/svm/wallet/sendCoinComplete")
+	public String sendCoinComplete(@RequestBody String map, ModelMap model) throws UnknownHostException, IOException {
+		String requestValue = StringUtil.nvl(URLDecoder.decode(map,"utf-8"));
+		if((requestValue.substring(requestValue.length()-1)).equals("=")) requestValue = requestValue.substring(0, requestValue.length()-1);
+		model.addAttribute("requestValue" ,requestValue);
+		return "svm/wallet/sendCoinComplete";
+	}
+
+	/*
+	 * Create Wallet Entry Form
+	 */
+	@RequestMapping("/svm/wallet/createWalletForm")
+	public String createWalletForm(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/createWalletForm";
+	}
+	
+	/*
+	 * My Wallet List
+	 */
+	@RequestMapping("/svm/wallet/myWalletList")
+	public String myWalletList(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/myWalletList";
+	}
+	
+	/*
 	 * Transaction history
 	 */
 	@RequestMapping("/svm/wallet/myTransHistory")
@@ -37,4 +75,39 @@ public class WalletController {
 		return "svm/wallet/myTransHistory";
 	}
 	
+	/*
+	 * Create Wallet Restore Name Input Form
+	 */
+	@RequestMapping("/svm/wallet/createWalletRestore")
+	public String createWalletRestore(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/createWalletRestore";
+	}
+
+	/*
+	 * Move regist wallet form page
+	 */
+	@RequestMapping("/svm/wallet/registWalletForm")
+	public String registWalletForm(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/registWalletForm";
+	}
+
+	@RequestMapping("/svm/wallet/sendTokenForm")
+	public String sendTokenForm(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/sendTokenForm";
+	}
+
+	@RequestMapping("/svm/wallet/createTokenForm")
+	public String createTokenForm(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/createTokenForm";
+	}
+
+	@RequestMapping("/svm/wallet/mintTokenForm")
+	public String mintTokenForm(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/mintTokenForm";
+	}
+	
+	@RequestMapping("/svm/wallet/myTokenHistory")
+	public String myTokenHistory(HttpServletRequest request, ModelMap model) throws UnknownHostException, IOException {
+		return "svm/wallet/myTokenHistory";
+	}
 }

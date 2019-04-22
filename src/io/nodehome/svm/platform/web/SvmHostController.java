@@ -382,7 +382,7 @@ public class SvmHostController {
 			e1.printStackTrace();
 		}
 
-		System.out.println("tempHosts  : "+tempHosts);
+		//System.out.println("tempHosts  : "+tempHosts);
 		if(tempHosts!=null && !tempHosts.equals("")) {
 			JSONParser paRes = new JSONParser();
 			// Write local server properties file.
@@ -445,8 +445,8 @@ public class SvmHostController {
 	    headers.setContentType(MediaType.APPLICATION_JSON);
 	    HttpEntity<String> param= new HttpEntity<String>(JSONInput, headers);
 
-		//System.out.println("SvmHostController.java requestUrl "+requestUrl);
-		//System.out.println("SvmHostController.java 1");
+		////System.out.println("SvmHostController.java requestUrl "+requestUrl);
+		////System.out.println("SvmHostController.java 1");
 	    RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
 	    String result = "";
 	    try {
@@ -455,7 +455,7 @@ public class SvmHostController {
 	        ;
 	        //e.printStackTrace();
 	    }
-	    //System.out.println("SvmHostController.java 2");
+	    ////System.out.println("SvmHostController.java 2");
 
 		return result;
 	}
@@ -504,8 +504,8 @@ public class SvmHostController {
     	String remoteAddessIp = request.getRemoteAddr();
     	String localServiceHost = request.getRequestURL().toString();
     	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
-		System.out.println("localServiceHost  : "+localServiceHost);
-		System.out.println("localServiceIp  : "+remoteAddessIp);
+		//System.out.println("localServiceHost  : "+localServiceHost);
+		//System.out.println("localServiceIp  : "+remoteAddessIp);
     	String verifiResult = BlacklistVO.NORMAL;
     	String tempHosts = "";
     	
@@ -549,7 +549,7 @@ public class SvmHostController {
 //			} catch (ParseException e) {
 //				e.printStackTrace();
 //			}
-//			System.out.println("nodem tempHosts : "+String.valueOf(nodemRes.get("ec")));
+//			//System.out.println("nodem tempHosts : "+String.valueOf(nodemRes.get("ec")));
 //
 //			long nCode = (Long)nodemRes.getOrDefault("ec",-1);
 //			if(nCode == 0) {
@@ -598,7 +598,7 @@ public class SvmHostController {
 	    	
 			// [ blacklist 파일 등록 ]
 	    	sroot = hostPropertiesPath.replaceAll("\\\\", "/") + "blacklist_"+serviceId+".properties";
-	    	//System.out.println("sroot : "+sroot);
+	    	////System.out.println("sroot : "+sroot);
 
 	    	file = new File(sroot);
 	    	if(!file.exists()) {
