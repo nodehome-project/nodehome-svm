@@ -5,7 +5,6 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="io.nodehome.svm.common.util.EtcUtils"%>
 
-<%@ include file="/inc/alertMessage.jsp" %>
 <%
 String localServiceHost = request.getRequestURL().toString();
 localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
