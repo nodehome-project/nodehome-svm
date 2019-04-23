@@ -349,43 +349,6 @@ function AWI_runTransaction(transType, jaArgs, callbackFunc, displayTitle, displ
 	}
 }
 
-//backup
-function AWI_setBackup(walletId) {
-	var sReturn = "{ \"result\":\"FAIL\" }"
-	if(!AWI_ENABLE) return;
-	var joCmd = null;
-	var params = new Object();
-	params['cmd'] = "backup";
-	params['walletId'] = walletId;
-	joCmd = {func:params};
-	if(AWI_DEVICE == 'ios') {
-		sReturn =  prompt(JSON.stringify(joCmd));	
-	} else if(AWI_DEVICE == 'android') {
-		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
-	} else { // windows
-		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
-	}
-	return sReturn;
-}
-
-//restore
-function AWI_setRestore(walletId) {
-	var sReturn = "{ \"result\":\"FAIL\" }"
-	if(!AWI_ENABLE) return;
-	var joCmd = null;
-	var params = new Object();
-	params['cmd'] = "restore";
-	joCmd = {func:params};
-	if(AWI_DEVICE == 'ios') {
-		sReturn =  prompt(JSON.stringify(joCmd));	
-	} else if(AWI_DEVICE == 'android') {
-		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
-	} else { // windows
-		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
-	}
-	return sReturn;
-}
-
 //showQRCode
 function AWI_showQRCode(walletId, walletName) {
 	var sReturn = "{ \"result\":\"FAIL\" }"
