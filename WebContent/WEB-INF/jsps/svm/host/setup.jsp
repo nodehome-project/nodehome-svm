@@ -146,7 +146,7 @@ localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
 			      Host manager port
 			    </div>
 			    <div class="col-sm-2">
-			      <input type="text" class="form-control" name="mport" id="mport" placeholder="8860" value="8860"/>
+			      <input type="text" class="form-control" name="mport" id="mport" placeholder="8886" value="8886"/>
 			    </div>
 			    <div class="col-sm-8">
 			      <button type="button" class="btn btn-primary btn-lg" style="width:100%; text-align:center;" onclick="updateHosts();">My Host Add Request and List Update</button>
