@@ -257,10 +257,11 @@ public class SvmHostController {
     	String sroot = hostPropertiesPath+"host_"+serviceId+".properties";
     	sroot = sroot.replaceAll("\\\\", "/");
 
-    	boolean scChk = true;
+    	boolean scChk = false;
     	// Request host url Security validation *********************************************************************************** ****************************************** - START
     	String returnMsg = checkBlacklist(request, serviceId, requestUrl, mport);
-    	if(returnMsg.indexOf(BlacklistVO.ABNORMAL)<0 && returnMsg.indexOf("FAIL")<0) {
+    	System.out.println("Security validation returnMsg : "+returnMsg);
+    	if(returnMsg.indexOf(BlacklistVO.NORMAL)>-1) {
     		scChk = true;
     	}
         // Request host url Security validation *********************************************************************************** ****************************************** - END
@@ -282,6 +283,10 @@ public class SvmHostController {
 				result = "FAIL";
 				e.printStackTrace();
 			}	
+    	} else {
+			System.out.println(requestUrl + " Verification Fail");
+    		result = "FAIL";
+    		message = "Verification Fail";
     	}
     	// Record in local host list file - END
     	
@@ -499,7 +504,7 @@ public class SvmHostController {
 	}
 
     public String checkBlacklist(HttpServletRequest request, String serviceId, String verifiHost, String mport) {
-		String returnMsg = "{ \"result\":\"FAIL\" , \"message\":\"Connection Fail\" }";
+		String returnMsg = "{ \"result\":\"OK\" , \"message\":\""+BlacklistVO.NORMAL+"\" }";
 
     	String remoteAddessIp = request.getRemoteAddr();
     	String localServiceHost = request.getRequestURL().toString();
@@ -545,7 +550,7 @@ public class SvmHostController {
 			
 			System.out.println("nodem check ready ");
 			tempHosts = ApiHelper.postJSON(protocol+localServiceHost2+":"+GlobalProperties.getProperty("nodem_port")+"/nodem.bin", "{ \"cmd\":\"REQ_SN_checknode\" , \"pid\":\"pid\",\"ver\":10000, \"args\":[\""+localServiceHost+"\" ,\""+serviceId+"\", \""+verifiHost+"\" ,\""+mport+"\"] }");
-			System.out.println("tempHosts : "+tempHosts);
+			System.out.println(localServiceHost2 + " tempHosts : "+tempHosts);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
