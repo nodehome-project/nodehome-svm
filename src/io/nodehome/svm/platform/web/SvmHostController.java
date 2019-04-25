@@ -257,7 +257,7 @@ public class SvmHostController {
     	String sroot = hostPropertiesPath+"host_"+serviceId+".properties";
     	sroot = sroot.replaceAll("\\\\", "/");
 
-    	boolean scChk = false;
+    	boolean scChk = true;
     	// Request host url Security validation *********************************************************************************** ****************************************** - START
     	String returnMsg = checkBlacklist(request, serviceId, requestUrl, mport);
     	if(returnMsg.indexOf(BlacklistVO.ABNORMAL)<0 && returnMsg.indexOf("FAIL")<0) {
@@ -479,7 +479,7 @@ public class SvmHostController {
 	/*
 	 * *********************************************************************** Blacklist management process
 	 */
-	
+
 	/*
 	 * 등록 프로세스 시작
 	 * 최초 blacklist 등록 요청 프로세스
@@ -499,14 +499,12 @@ public class SvmHostController {
 	}
 
     public String checkBlacklist(HttpServletRequest request, String serviceId, String verifiHost, String mport) {
-		String returnMsg = "{ \"result\":\""+BlacklistVO.NORMAL+"\" }";
+		String returnMsg = "{ \"result\":\"FAIL\" , \"message\":\"Connection Fail\" }";
 
     	String remoteAddessIp = request.getRemoteAddr();
     	String localServiceHost = request.getRequestURL().toString();
     	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
-		//System.out.println("localServiceHost  : "+localServiceHost);
-		//System.out.println("localServiceIp  : "+remoteAddessIp);
-    	String verifiResult = BlacklistVO.NORMAL;
+    	String verifiResult = "";
     	String tempHosts = "";
     	
 		/*
@@ -534,33 +532,41 @@ public class SvmHostController {
 			18	호출오류
 			19	* 응답 값의 Signature 가 맞지 않는다.	회손추정
 		 */
-		
-//    	JSONObject nodemRes = null;
-//    	JSONParser parser = new JSONParser();
-//		
-//		try {
-//			tempHosts = ApiHelper.postJSON(localServiceHost+"/nodem.bin", "{ \"cmd\":\"REQ_SN_checknode\" , \"pid\":\"pid\",\"ver\":10000, \"args\":[\""+localServiceHost+"\" ,\""+serviceId+"\", \""+verifiHost+"\" ,\""+mport+"\"] }");
-//		} catch (IOException e1) {
-//			e1.printStackTrace();
-//		}
-//		if(tempHosts!=null && !tempHosts.equals("")) {
-//			try {
-//				nodemRes = (JSONObject)parser.parse(tempHosts);
-//			} catch (ParseException e) {
-//				e.printStackTrace();
-//			}
-//			//System.out.println("nodem tempHosts : "+String.valueOf(nodemRes.get("ec")));
-//
-//			long nCode = (Long)nodemRes.getOrDefault("ec",-1);
-//			if(nCode == 0) {
-//				verifiResult = BlacklistVO.NORMAL;
-//			} else if(nCode==1 || nCode==5 || nCode==7 || nCode==8 || nCode==19) {
-//				verifiResult = BlacklistVO.ABNORMAL;
-//				returnMsg = "{ \"result\":\""+BlacklistVO.ABNORMAL+"\" , \"message\":\"Hacked Sources\" }";
-//			} else {
-//				returnMsg = "{ \"result\":\"FAIL\" , \"message\":\"Verification Fail\" }";
-//			}
-//		}
+	
+    	JSONObject nodemRes = null;
+    	JSONParser parser = new JSONParser();
+
+		String localServiceHost2 = localServiceHost;
+		try {
+			String protocol = localServiceHost2.substring(0,localServiceHost2.indexOf("://")+3);
+			localServiceHost2 = localServiceHost2.substring(localServiceHost2.indexOf("://")+3);
+			if(localServiceHost2.indexOf(":")>-1)
+				localServiceHost2 = localServiceHost2.substring(0,localServiceHost2.indexOf(":")-1);
+			
+			System.out.println("nodem check ready ");
+			tempHosts = ApiHelper.postJSON(protocol+localServiceHost2+":"+GlobalProperties.getProperty("nodem_port")+"/nodem.bin", "{ \"cmd\":\"REQ_SN_checknode\" , \"pid\":\"pid\",\"ver\":10000, \"args\":[\""+localServiceHost+"\" ,\""+serviceId+"\", \""+verifiHost+"\" ,\""+mport+"\"] }");
+			System.out.println("tempHosts : "+tempHosts);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		if(tempHosts!=null && !tempHosts.equals("")) {
+			try {
+				nodemRes = (JSONObject)parser.parse(tempHosts);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			//System.out.println("nodem tempHosts : "+String.valueOf(nodemRes.get("ec")));
+
+			long nCode = (Long)nodemRes.getOrDefault("ec",-1);
+			if(nCode == 0) {
+				verifiResult = BlacklistVO.NORMAL;
+			} else if(nCode==1 || nCode==5 || nCode==7 || nCode==8 || nCode==19) {
+				verifiResult = BlacklistVO.ABNORMAL;
+				returnMsg = "{ \"result\":\""+BlacklistVO.ABNORMAL+"\" , \"message\":\"Hacked Sources\" }";
+			} else {
+				returnMsg = "{ \"result\":\"FAIL\" , \"message\":\"Verification Fail\" }";
+			}
+		}
 		/*
 		 ********************************* node manager 검증 프로세스 끝
 		 */
@@ -569,7 +575,9 @@ public class SvmHostController {
 		BlacklistVO.setCheckResult(serviceId, remoteAddessIp, verifiHost, verifiResult);
 		
 		List hostList = new ArrayList();
+		System.out.println("검증 결과 verifiResult : "+verifiResult);
 		if(verifiResult.equals(BlacklistVO.ABNORMAL)) {
+			System.out.println("verifiResult : " +verifiResult);
 			String targetHostStr = "";
 			String sroot = hostPropertiesPath+"host_"+serviceId+".properties";
 	    	sroot = sroot.replaceAll("\\\\", "/");
@@ -598,7 +606,7 @@ public class SvmHostController {
 	    	
 			// [ blacklist 파일 등록 ]
 	    	sroot = hostPropertiesPath.replaceAll("\\\\", "/") + "blacklist_"+serviceId+".properties";
-	    	////System.out.println("sroot : "+sroot);
+	    	//System.out.println("sroot : "+sroot);
 
 	    	file = new File(sroot);
 	    	if(!file.exists()) {
@@ -658,7 +666,9 @@ public class SvmHostController {
 		        				String[] tUrl = hUrl.split(Pattern.quote("|"));
 		        				tempHosts = "";
 		        				try {
-		        					tempHosts = ApiHelper.postJSON(""+tUrl[0]+"/host/requestBlockHost", "{\"serviceId\":\""+serviceId+"\",\"verifiHost\":\""+verifiHost+"\",\"verifiResult\":\""+verifiResult+"\",\"mport\":\""+mport+"\"}");
+		        					System.out.println(tUrl[0] + "에 검증 요청!");
+		        					tempHosts = ApiHelper.postJSON(""+tUrl[0]+"/host/requestBlockHost", "{\"reporterHost\":\""+localServiceHost+"\",\"serviceId\":\""+serviceId+"\",\"verifiHost\":\""+verifiHost+"\",\"verifiResult\":\""+verifiResult+"\",\"mport\":\""+mport+"\"}");
+		        					System.out.println(tUrl[0] + "에 검증 결과 : "+tempHosts);
 		        				} catch (IOException e1) {
 		        					//e1.printStackTrace();
 		        				}
@@ -672,6 +682,85 @@ public class SvmHostController {
 		return returnMsg;
 	}
 
+    // 검사만 하고 broadcasting 없음
+    public String checkBlacklist2(HttpServletRequest request, String serviceId, String verifiHost, String mport) {
+		String returnMsg = "{ \"result\":\"FAIL\" , \"message\":\"Connection Fail\" }";
+
+    	String remoteAddessIp = request.getRemoteAddr();
+    	String localServiceHost = request.getRequestURL().toString();
+    	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
+    	String verifiResult = "";
+    	String tempHosts = "";
+    	
+		/*
+		 ********************************* node manager 검증 프로세스 시작
+		 * 
+		 * node 검증 처리 결과 코드
+		 * 	0	 성공 	성공
+			1	* 에러 내용 알수 없음	회손추정
+			2	호출오류
+			3	Json 파싱에 실패했다. 자신의 Sapp Hash를 구하는데 실패함 	호출오류
+			4	대상 nodem으로 연결 실패 (url,port등이 틀렸을수 있다.)	통신장애
+			5	* 대상  nodem에서의 응답값을 해석할 수 없음(파라메터 형식 / 규칙이 맞지 않음), 	회손추정
+			6	서비스 아이디가 다르게 호출되었다.	호출오류
+			7	* Sapp 을 찾지 못함	회손추정
+			8	* Sapp의 사이트 hash값이 맞지 않는다. 	회손추정
+			9	호출오류
+			10	호출오류
+			11	파라메터 수가 맞지 않음	호출오류
+			12	파라메터 url을 해석하는 데 실패함, nodem 포트번호 해석 실패, nonce문자열이 10보다 작다.	호출오류
+			13	호출오류
+			14	호출오류
+			15	호출오류
+			16	호출오류
+			17	로칼에서 호출되지 않았다. 자기자신을 검증하려고 시도했다. 호출오류
+			18	호출오류
+			19	* 응답 값의 Signature 가 맞지 않는다.	회손추정
+		 */
+	
+    	JSONObject nodemRes = null;
+    	JSONParser parser = new JSONParser();
+
+		String localServiceHost2 = localServiceHost;
+		try {
+			String protocol = localServiceHost2.substring(0,localServiceHost2.indexOf("://")+3);
+			localServiceHost2 = localServiceHost2.substring(localServiceHost2.indexOf("://")+3);
+			if(localServiceHost2.indexOf(":")>-1)
+				localServiceHost2 = localServiceHost2.substring(0,localServiceHost2.indexOf(":")-1);
+			
+			tempHosts = ApiHelper.postJSON(protocol+localServiceHost2+":"+GlobalProperties.getProperty("nodem_port")+"/nodem.bin", "{ \"cmd\":\"REQ_SN_checknode\" , \"pid\":\"pid\",\"ver\":10000, \"args\":[\""+localServiceHost+"\" ,\""+serviceId+"\", \""+verifiHost+"\" ,\""+mport+"\"] }");
+			System.out.println("tempHosts : "+tempHosts);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		if(tempHosts!=null && !tempHosts.equals("")) {
+			try {
+				nodemRes = (JSONObject)parser.parse(tempHosts);
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			//System.out.println("nodem tempHosts : "+String.valueOf(nodemRes.get("ec")));
+
+			long nCode = (Long)nodemRes.getOrDefault("ec",-1);
+			if(nCode == 0) {
+				verifiResult = BlacklistVO.NORMAL;
+			} else if(nCode==1 || nCode==5 || nCode==7 || nCode==8 || nCode==19) {
+				verifiResult = BlacklistVO.ABNORMAL;
+				returnMsg = "{ \"result\":\""+BlacklistVO.ABNORMAL+"\" , \"message\":\"Hacked Sources\" }";
+			} else {
+				returnMsg = "{ \"result\":\"FAIL\" , \"message\":\"Verification Fail\" }";
+			}
+		}
+		/*
+		 ********************************* node manager 검증 프로세스 끝
+		 */
+		
+		// [ 검사 결과 메모리 저장 ]
+		BlacklistVO.setCheckResult(serviceId, remoteAddessIp, verifiHost, verifiResult);
+		
+		return returnMsg;
+	}
+    
 	/*
 	 * blacklist 등록 요청 전파
 	 * 최초 신고SApp이 다른 Sapp 에 blacklist요청 할떄 호출. 신고 받은 내용 검증 후 blacklist 처리하고 seed server에 notification.
@@ -682,8 +771,11 @@ public class SvmHostController {
 		String returnMsg = "{ \"result\":\"OK\" }";
     	String localServiceHost = request.getRequestURL().toString();
     	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
+    	System.out.println("요청 받음 /host/requestBlockHost - localServiceHost : "+localServiceHost);
 
-    	String remoteAddessIp = request.getRemoteAddr();	// 최초 요청자 host
+    	String remoteAddessIp = request.getRemoteAddr();	
+    	String reporterHost = StringUtil.nvl(map.get("reporterHost")); // 최초 요청자 host
+    	
     	String serviceId = StringUtil.nvl(map.get("serviceId"));	// service id
     	String verifiHost = StringUtil.nvl(map.get("verifiHost"));	// blacklist 대상 sapp host
     	String mport = StringUtil.nvl(map.get("mport"));
@@ -695,7 +787,7 @@ public class SvmHostController {
 		 */
 		String result = ""; // normal / abnormal 판정
     	JSONParser paRes = new JSONParser();
-		returnMsg = checkBlacklist(request, serviceId, verifiHost, mport);	// Verification 
+		returnMsg = checkBlacklist2(request, serviceId, verifiHost, mport);	// Verification 
 		try {
 			JSONObject joRes = (JSONObject) paRes.parse(returnMsg);
 			result = String.valueOf(joRes.get("result"));	
@@ -777,11 +869,13 @@ public class SvmHostController {
         	}
 		}
 		
+		System.out.println("요청 받음 결과 result : "+result);
 		if(result.equals(BlacklistVO.NORMAL) || result.equals(BlacklistVO.ABNORMAL)) {
 			// [********** Seed server에 noti **********]
 			String tempHosts = "";
 			try {
 				tempHosts = ApiHelper.postJSON(""+SEED_HOST+"/notiBlacklist", "{\"serviceId\":\""+serviceId+"\",\"remoteHost\":\""+localServiceHost+"\",\"initialClaimant\":\""+remoteAddessIp+"\",\"verifiHost\":\""+verifiHost+"\",\"verifiResult\":\""+result+"\"}");
+				System.out.println("요청 받음 결과 result tempHosts : "+tempHosts);
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}

@@ -15,6 +15,10 @@ public class BlacklistVO implements Serializable {
 	public static String NORMAL = "normal";		// 판정결과 정상
 	public static String ABNORMAL = "abnormal";	// 판정결과 비정상
 	
+	public static void initList() {
+		blacklist = new ArrayList();
+	}
+	
 	/*
 	 * blacklist host map에 등록
 	 */
