@@ -1,5 +1,7 @@
 package io.nodehome.cmm.config;
 
+import java.io.IOException;
+
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -13,6 +15,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import io.nodehome.cmm.service.GlobalProperties;
+import io.nodehome.svm.common.biz.ApiHelper;
 import io.nodehome.svm.common.biz.CoinListVO;
 import io.nodehome.svm.common.biz.NAHostVO;
 import io.nodehome.svm.common.biz.ServiceWalletVO;
@@ -78,6 +81,14 @@ public class InitWebApplicationInitializer implements WebApplicationInitializer 
 		else if(strValue.equals("DEBUGNET"))
 			emType = NetworkType.DEBUGNET;
 		NetConfig.setDefaultNet(emType);
+
+		String tempHosts = "";
+		try {
+			tempHosts = ApiHelper.postJSON("http://127.0.0.1:"+GlobalProperties.getProperty("nodem_port")+"/selfcheck.bin?p="+GlobalProperties.getProperty("nodem_port")+"&d="+GlobalProperties.getProperty("Globals.serviceHost"), "{}");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		System.out.println("selfcheck.bin : "+tempHosts);
 
 		//----------------------------------
 		KeyManager.reloadManagerKey();
