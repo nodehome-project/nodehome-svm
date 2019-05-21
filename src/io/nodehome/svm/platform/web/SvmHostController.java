@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -236,6 +237,62 @@ public class SvmHostController {
 
     	return returnMsg;
     }
+
+	// Function to request host addition
+	// add manager invokes
+	// URL invoked from SApp web page
+	@RequestMapping("/host/addHostProcess")
+    public @ResponseBody String addRequest(HttpServletRequest request, ModelMap model) {
+		String returnMsg = "";
+    	String strFail = "{ \"result\":\"FAIL\" }";
+    	String svrCd = StringUtil.nvl(request.getParameter("serviceId"),GlobalProperties.getProperty("project_serviceid"));
+
+    	ServletContext context = request.getServletContext();
+    	String sroot = hostPropertiesPath.replaceAll("\\\\", "/") + "host_"+svrCd+".properties";
+
+    	String localServiceHost = request.getRequestURL().toString();
+    	String localServiceIp = request.getRemoteAddr();
+    	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
+    	String mport = StringUtil.nvl(request.getParameter("mport"));
+    	String mdomain = StringUtil.nvl(request.getParameter("mdomain"));
+    	String mip = StringUtil.nvl(request.getParameter("mip"));
+    	
+		String tempHosts = "";
+		try {
+			tempHosts = ApiHelper.postJSON(""+SEED_HOST+"/requestAddHost", "{\"serviceId\":\""+svrCd+"\",\"mdomain\":\""+mdomain+"\",\"mip\":\""+mip+"\",\"mport\":\""+mport+"\",\"requestUrl\":\""+localServiceHost+"|"+localServiceIp+"\"}");
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		//System.out.println("tempHosts  : "+tempHosts);
+		if(tempHosts!=null && !tempHosts.equals("")) {
+			JSONParser paRes = new JSONParser();
+			// Write local server properties file.
+			String writeContent = "# "+DateUtil.getDate("yyyyMMddHHmmss")+"\n";
+			try {
+				JSONObject joRes = (JSONObject) paRes.parse(tempHosts);
+				String result = (String)joRes.get("result");
+				if(result.equals("ACCEPT") || result.equals("LIST")) {
+					JSONArray hostArrary = (JSONArray) paRes.parse(joRes.get("list").toString()); 	// host list from server seed host
+					for(int i=0; i<hostArrary.size(); i++) {
+						if(!localServiceHost.equals((StringUtil.nvl(hostArrary.get(i),"")).toString())) {	
+							writeContent += StringUtil.nvl(hostArrary.get(i),"")+"\n";
+						}
+					}
+				}
+				
+				FileUtil.writeFile(sroot, "utf-8", false, writeContent);
+			} catch (ParseException e) {
+				returnMsg = "{ \"result\":\"FAIL\" }";
+			} catch (Exception e) {
+				returnMsg = "{ \"result\":\"FAIL\" }";
+			}
+		}
+		
+		String result = "success";
+		String message = "";
+		return getResultJsonMessage(result, message);
+	}
 	
 	/*
 	 * host API to receive registration request
@@ -259,7 +316,7 @@ public class SvmHostController {
 
     	boolean scChk = false;
     	// Request host url Security validation *********************************************************************************** ****************************************** - START
-    	String returnMsg = checkBlacklist(request, serviceId, requestUrl, mport);
+    	String returnMsg = checkBlacklist(request, localServiceHost, serviceId, requestUrl, mport);
     	System.out.println("Security validation returnMsg : "+returnMsg);
     	if(returnMsg.indexOf(BlacklistVO.NORMAL)>-1) {
     		scChk = true;
@@ -293,6 +350,30 @@ public class SvmHostController {
 		return getResultJsonMessage(result, message);
 	}
 
+	@RequestMapping("/host/testBlackList")
+    public @ResponseBody String testBlackList(HttpServletRequest request, ModelMap model) {
+		String result = "OK";
+		String message = "";
+
+//		BlacklistVO.initList();
+//    	String mport = "8886";
+//    	String serviceId = "nodehome";
+//    	String requestUrl = "http://test-nodehome2.nodehome.io";
+//    	if(requestUrl.equals("")) getResultJsonMessage("FAIL", "empty url");
+//    	String localServiceHost = request.getRequestURL().toString();
+//    	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
+//    	
+//    	boolean scChk = false;
+//    	// Request host url Security validation *********************************************************************************** ****************************************** - START
+//    	String returnMsg = checkBlacklist(request, serviceId, requestUrl, mport);
+//    	if(returnMsg.indexOf(BlacklistVO.ABNORMAL)<0 && returnMsg.indexOf("FAIL")<0) {
+//    		scChk = true;
+//    	}
+//        // Request host url Security validation *********************************************************************************** ****************************************** - END
+    	
+		return getResultJsonMessage(result, message);
+	}
+	
 	@RequestMapping("/setup")
     public String setup(HttpServletRequest request, ModelMap model) {
     	String serviceId = StringUtil.nvl(request.getParameter("serviceid"),GlobalProperties.getProperty("project_serviceid"));
@@ -360,62 +441,6 @@ public class SvmHostController {
 		String message = ""; 
 		return getResultJsonMessage(result, message);
 	}
-
-	// Function to request host addition
-	// add manager invokes
-	// URL invoked from SApp web page
-	@RequestMapping("/host/addHostProcess")
-    public @ResponseBody String addRequest(HttpServletRequest request, ModelMap model) {
-		String returnMsg = "";
-    	String strFail = "{ \"result\":\"FAIL\" }";
-    	String svrCd = StringUtil.nvl(request.getParameter("serviceId"),GlobalProperties.getProperty("project_serviceid"));
-
-    	ServletContext context = request.getServletContext();
-    	String sroot = hostPropertiesPath.replaceAll("\\\\", "/") + "host_"+svrCd+".properties";
-
-    	String localServiceHost = request.getRequestURL().toString();
-    	String localServiceIp = request.getRemoteAddr();
-    	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
-    	String mport = StringUtil.nvl(request.getParameter("mport"));
-    	String mdomain = StringUtil.nvl(request.getParameter("mdomain"));
-    	String mip = StringUtil.nvl(request.getParameter("mip"));
-    	
-		String tempHosts = "";
-		try {
-			tempHosts = ApiHelper.postJSON(""+SEED_HOST+"/requestAddHost", "{\"serviceId\":\""+svrCd+"\",\"mdomain\":\""+mdomain+"\",\"mip\":\""+mip+"\",\"mport\":\""+mport+"\",\"requestUrl\":\""+localServiceHost+"|"+localServiceIp+"\"}");
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
-
-		//System.out.println("tempHosts  : "+tempHosts);
-		if(tempHosts!=null && !tempHosts.equals("")) {
-			JSONParser paRes = new JSONParser();
-			// Write local server properties file.
-			String writeContent = "# "+DateUtil.getDate("yyyyMMddHHmmss")+"\n";
-			try {
-				JSONObject joRes = (JSONObject) paRes.parse(tempHosts);
-				String result = (String)joRes.get("result");
-				if(result.equals("ACCEPT") || result.equals("LIST")) {
-					JSONArray hostArrary = (JSONArray) paRes.parse(joRes.get("list").toString()); 	// host list from server seed host
-					for(int i=0; i<hostArrary.size(); i++) {
-						if(!localServiceHost.equals((StringUtil.nvl(hostArrary.get(i),"")).toString())) {	
-							writeContent += StringUtil.nvl(hostArrary.get(i),"")+"\n";
-						}
-					}
-				}
-				
-				FileUtil.writeFile(sroot, "utf-8", false, writeContent);
-			} catch (ParseException e) {
-				returnMsg = "{ \"result\":\"FAIL\" }";
-			} catch (Exception e) {
-				returnMsg = "{ \"result\":\"FAIL\" }";
-			}
-		}
-		
-		String result = "success";
-		String message = "";
-		return getResultJsonMessage(result, message);
-	}
 	
 	public String urlConnection(String connUrl) {
 		String returnList = "";
@@ -450,8 +475,8 @@ public class SvmHostController {
 	    headers.setContentType(MediaType.APPLICATION_JSON);
 	    HttpEntity<String> param= new HttpEntity<String>(JSONInput, headers);
 
-		////System.out.println("SvmHostController.java requestUrl "+requestUrl);
-		////System.out.println("SvmHostController.java 1");
+		//System.out.println("SvmHostController.java requestUrl "+requestUrl);
+		//System.out.println("SvmHostController.java 1");
 	    RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
 	    String result = "";
 	    try {
@@ -460,7 +485,7 @@ public class SvmHostController {
 	        ;
 	        //e.printStackTrace();
 	    }
-	    ////System.out.println("SvmHostController.java 2");
+	    //System.out.println("SvmHostController.java 2");
 
 		return result;
 	}
@@ -480,34 +505,91 @@ public class SvmHostController {
 		return ret.toJSONString();
 	}
 
+	public String readPostData(HttpServletRequest request) {
+		InputStream is;
+		try 
+		{
+			is = request.getInputStream();
 
+		    BufferedReader br = new BufferedReader(new InputStreamReader(is));
+	
+		    StringBuffer sbLines = new StringBuffer();
+		    String strLine = "";
+	
+			while((strLine = br.readLine()) != null) {
+					strLine = br.readLine();
+					sbLines.append(strLine);
+			}
+			return sbLines.toString();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
 	/*
 	 * *********************************************************************** Blacklist management process
 	 */
 
 	/*
-	 * 등록 프로세스 시작
-	 * 최초 blacklist 등록 요청 프로세스
 	 * view에서 호출될 수 있도록 api로 제공한다. 
+	 * 정기적 검사를 위한 api
 	 */
-	@RequestMapping("/host/checkBlacklist")
-	@ResponseBody
-    public String checkBlacklist(HttpServletRequest request, @RequestBody HashMap<String,String> map, ModelMap model) {
-		String returnMsg = "{ \"result\":\"OK\" }";
-    	String serviceId = StringUtil.nvl(map.get("serviceId"),GlobalProperties.getProperty("project_serviceid"));
-		String verifiHost = StringUtil.nvl(map.get("verifiHost"));
-		String mport = StringUtil.nvl(map.get("mport"));
+	@RequestMapping("/eventCheckNode")
+    public @ResponseBody String eventCheckNode(HttpServletRequest request, @RequestBody HashMap<String,String> map) {
+		String result = "FAIL";
+		String message = "";
 
-		returnMsg = checkBlacklist(request, serviceId, verifiHost, mport);
-		
-		return returnMsg;
+		BlacklistVO.initList();
+    	String mport = StringUtil.nvl(map.get("mport"));
+    	String serviceId = StringUtil.nvl(map.get("serviceId"), GlobalProperties.getProperty("project_serviceid"));
+    	String requestUrl = StringUtil.nvl(map.get("requestUrl"));
+    	String targetUrl = StringUtil.nvl(map.get("targetUrl"));
+    	if(requestUrl.equals("")) getResultJsonMessage("FAIL", "empty url");
+    	System.out.println("requestVerification targetUrl : "+targetUrl);
+    	
+    	String returnMsg = checkBlacklist(request, requestUrl, serviceId, targetUrl, mport);
+    	if(returnMsg.indexOf(BlacklistVO.ABNORMAL)>-1) {
+    		result = "FAIL";
+    		message = "Fake host.";
+    	} else if(returnMsg.indexOf(BlacklistVO.NORMAL)>-1) {
+    		result = "OK";
+    		message = "Normal host.";
+    	}
+    	
+		return getResultJsonMessage(result, message);
 	}
 
-    public String checkBlacklist(HttpServletRequest request, String serviceId, String verifiHost, String mport) {
+	@RequestMapping("/checkNode")
+	@ResponseBody
+    public String checkNode(HttpServletRequest request) {
+		String strRespone = "";
+		try {
+			//out.clear();
+			String sBody = readRequest(request.getReader());
+			String urlNodeM = "http://127.0.0.1:" + GlobalProperties.getProperty("nodem_port") + "/nodem.bin";
+			strRespone = ApiHelper.postJSON(urlNodeM, sBody);
+			//out.write(strRespone);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			strRespone = "{\"ec\":5 ,\"Pid\":\"pid\",\"value\":{},\"ref\":\"Unknown response\"}";
+			//out.write("{\"ec\":5 ,\"Pid\":\"pid\",\"value\":\"{}\",\"ref\":\"Unknown response\"}");
+		}
+		return strRespone.toString();
+	}
+	String readRequest(BufferedReader brReq) throws IOException {
+		StringBuffer sbBuffer = new StringBuffer();
+		String sLine;
+		while ((sLine = brReq.readLine()) != null) {
+			sbBuffer.append(sLine);		
+		}	
+		return sbBuffer.toString();
+	}
+	
+    public String checkBlacklist(HttpServletRequest request, String localServiceHost, String serviceId, String verifiHost, String mport) {
 		String returnMsg = "{ \"result\":\"OK\" , \"message\":\""+BlacklistVO.NORMAL+"\" }";
 
     	String remoteAddessIp = request.getRemoteAddr();
-    	String localServiceHost = request.getRequestURL().toString();
     	localServiceHost = localServiceHost.replaceAll(request.getRequestURI(),"");
     	String verifiResult = "";
     	String tempHosts = "";
@@ -577,6 +659,7 @@ public class SvmHostController {
 		 */
 		
 		// [ 검사 결과 메모리 저장 ]
+		System.out.println("검증 결과 verifiResult serviceId : "+serviceId);
 		BlacklistVO.setCheckResult(serviceId, remoteAddessIp, verifiHost, verifiResult);
 		
 		List hostList = new ArrayList();
@@ -747,8 +830,10 @@ public class SvmHostController {
 			//System.out.println("nodem tempHosts : "+String.valueOf(nodemRes.get("ec")));
 
 			long nCode = (Long)nodemRes.getOrDefault("ec",-1);
+			System.out.println("tempHosts nCode : "+nCode);
 			if(nCode == 0) {
 				verifiResult = BlacklistVO.NORMAL;
+				returnMsg = "{ \"result\":\"OK\" , \"message\":\"Verification OK\" }";
 			} else if(nCode==1 || nCode==5 || nCode==7 || nCode==8 || nCode==19) {
 				verifiResult = BlacklistVO.ABNORMAL;
 				returnMsg = "{ \"result\":\""+BlacklistVO.ABNORMAL+"\" , \"message\":\"Hacked Sources\" }";
