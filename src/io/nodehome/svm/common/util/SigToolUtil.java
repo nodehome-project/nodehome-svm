@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
-import io.nodehome.cmm.service.GlobalProperties;
+import io.nodehome.svm.common.biz.ChainInfoVO;
 
 public class SigToolUtil {
 
@@ -17,19 +17,19 @@ public class SigToolUtil {
 	// Generate Key
 	public String getGenerateKey() throws Exception {
 		String netID = "0xEF";
-		String project_net = GlobalProperties.getProperty("project_net");
-		if(project_net.equals("DEBUGNET")) netID = "0xDE";
-		if(project_net.equals("MAINNET")) netID = "0x80";
+		String project_net = ChainInfoVO.getNetwork();
+		if(project_net.equals("debug")) netID = "0xDE";
+		if(project_net.equals("main")) netID = "0x80";
 		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=newKey -netID="+netID+"");
 		return returnStr;
 	}
 	
 	// Verify Signature
 	public String getVerifySignature(String inputString, String pubk, String sig) throws Exception {
-		String project_net = GlobalProperties.getProperty("project_net");
+		String project_net = ChainInfoVO.getNetwork();
 		String netID = "0xEF";
-		if(project_net.equals("DEBUGNET")) netID = "0xDE";
-		if(project_net.equals("MAINNET")) netID = "0x80";
+		if(project_net.equals("debug")) netID = "0xDE";
+		if(project_net.equals("main")) netID = "0x80";
 		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=verify -netID="+netID+" -input=\""+inputString+"\" -pubKey="+pubk+" -signature="+sig+"");
 		return returnStr;
 	}
@@ -41,9 +41,9 @@ public class SigToolUtil {
 		 */
 		// Example : /sigtool -cmd=signature -netID=0xEF -input="Some Text" -privKey=cSTzWvT8NziMDitNdnqj7NiKuBH1D3VDCnHHpiQongPfyfpnwpxz
 		String netID = "0xEF";
-		String project_net = GlobalProperties.getProperty("project_net");
-		if(project_net.equals("DEBUGNET")) netID = "0xDE";
-		if(project_net.equals("MAINNET")) netID = "0x80";
+		String project_net = ChainInfoVO.getNetwork();
+		if(project_net.equals("debug")) netID = "0xDE";
+		if(project_net.equals("main")) netID = "0x80";
 		System.out.println(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=signature -netID="+netID+" -input=\""+inputString+"\" -privKey="+prik+"");
 		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=signature -netID="+netID+" -input=\""+inputString+"\" -privKey="+prik+"");
 		return returnStr;
@@ -52,9 +52,9 @@ public class SigToolUtil {
 	// Recover Key
 	public String getRecoverKey(String mnemonicWords) throws Exception {
 		String netID = "0xEF";
-		String project_net = GlobalProperties.getProperty("project_net");
-		if(project_net.equals("DEBUGNET")) netID = "0xDE";
-		if(project_net.equals("MAINNET")) netID = "0x80";
+		String project_net = ChainInfoVO.getNetwork();
+		if(project_net.equals("debug")) netID = "0xDE";
+		if(project_net.equals("main")) netID = "0x80";
 		String returnStr = runCommandExec(pcwalletPath+ System.getProperty("file.separator") + "sigtool -cmd=import -netID="+netID+" -mnemonicWords='"+mnemonicWords+"'");
 		return returnStr;
 	}

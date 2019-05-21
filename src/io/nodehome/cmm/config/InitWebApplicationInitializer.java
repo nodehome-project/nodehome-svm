@@ -16,6 +16,7 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 import io.nodehome.cmm.service.GlobalProperties;
 import io.nodehome.svm.common.biz.ApiHelper;
+import io.nodehome.svm.common.biz.ChainInfoVO;
 import io.nodehome.svm.common.biz.CoinListVO;
 import io.nodehome.svm.common.biz.NAHostVO;
 import io.nodehome.svm.common.biz.ServiceWalletVO;
@@ -73,15 +74,6 @@ public class InitWebApplicationInitializer implements WebApplicationInitializer 
 		LOGGER.debug("WebApplicationInitializer END-============================================");
 
 		//----------------------------------
-		// set default net type
-		String strValue = GlobalProperties.getProjectNet();
-		NetworkType emType = NetworkType.TESTNET; 
-		if(strValue.equalsIgnoreCase("MAINNET"))
-			emType = NetworkType.MAINNET;
-		else if(strValue.equals("DEBUGNET"))
-			emType = NetworkType.DEBUGNET;
-		NetConfig.setDefaultNet(emType);
-
 		String tempHosts = "";
 		try {
 			tempHosts = ApiHelper.postJSON("http://127.0.0.1:"+GlobalProperties.getProperty("nodem_port")+"/selfcheck.bin?p="+GlobalProperties.getProperty("nodem_port")+"&d="+GlobalProperties.getProperty("Globals.serviceHost"), "{}");
@@ -92,12 +84,20 @@ public class InitWebApplicationInitializer implements WebApplicationInitializer 
 
 		//----------------------------------
 		KeyManager.reloadManagerKey();
+		ChainInfoVO.reloadChainInfo();
 		CoinListVO.reloadCoinInfo();	// load coin info
 		CoinListVO.reloadCoinPolicy();	// load coin policy
 		ServiceWalletVO.reloadWalletInfo();	// load service node wallet info
 		NAHostVO.reloadNAHosts();	// load NA host list
 		//----------------------------------
-		
+
+		// set default net type
+		NetworkType emType = NetworkType.TESTNET; 
+		if((ChainInfoVO.getNetwork()).equalsIgnoreCase("main"))
+			emType = NetworkType.MAINNET;
+		else if((ChainInfoVO.getNetwork()).equals("debug"))
+			emType = NetworkType.DEBUGNET;
+		NetConfig.setDefaultNet(emType);
 	}
 	
 }

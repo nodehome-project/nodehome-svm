@@ -25,9 +25,6 @@ public class GlobalProperties {
 	public static final String RELATIVE_PATH_PREFIX = GlobalProperties.class.getResource("").getPath().substring(0, GlobalProperties.class.getResource("").getPath().lastIndexOf("io"));
 	public static final String GLOBALS_PROPERTIES_FILE = RELATIVE_PATH_PREFIX + "resources/props" + FILE_SEPARATOR + "globals.properties";
 
-	public static String getProjectNet() {
-		return getProperty2("project_net", "");
-	}
 	public static String getProjectApiHost() {
 		return getProperty2("project_api_path", "");
 	}
