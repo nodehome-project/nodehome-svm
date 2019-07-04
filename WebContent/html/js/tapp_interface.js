@@ -349,6 +349,48 @@ function AWI_runTransaction(transType, jaArgs, callbackFunc, displayTitle, displ
 	}
 }
 
+//[step 1] Terminal Send Coin Confirm
+function AWI_transferWebTransactionConfirm(transType, jaArgs, walletId, callbackFunc) {
+	var sReturn = "{ \"result\":\"FAIL\" , \"value\":{} }"
+	if(!AWI_ENABLE) return;
+	var joCmd = null;
+	var params =  new Object();
+	params['cmd'] = "transferWebTransactionConfirm";
+	params['transType'] = transType;
+	params['walletId'] = walletId;
+	params['args'] = jaArgs;
+	params['callbackFunc'] = callbackFunc;
+	joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+}
+
+//[step 2] Terminal Send Coin Process
+function AWI_transferWebTransaction(transType, jaArgs, walletId, callbackFunc) {
+	var sReturn = "{ \"result\":\"FAIL\" , \"value\":{} }"
+	if(!AWI_ENABLE) return;
+	var joCmd = null;
+	var params =  new Object();
+	params['cmd'] = "transferWebTransaction";
+	params['transType'] = transType;
+	params['walletId'] = walletId;
+	params['args'] = jaArgs;
+	params['callbackFunc'] = callbackFunc;
+	joCmd = {func:params};
+	if(AWI_DEVICE == 'ios') {
+		sReturn =  prompt(JSON.stringify(joCmd));	
+	} else if(AWI_DEVICE == 'android') {
+		sReturn =  window.AWI.callAppFunc(JSON.stringify(joCmd));	
+	} else { // windows
+		sReturn =  window.external.CallAppFunc(JSON.stringify(joCmd));	
+	}
+}
+
 //showQRCode
 function AWI_showQRCode(walletId, walletName) {
 	var sReturn = "{ \"result\":\"FAIL\" }"
