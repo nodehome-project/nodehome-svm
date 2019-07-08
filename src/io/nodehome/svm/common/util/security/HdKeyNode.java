@@ -7,13 +7,13 @@ import java.util.UUID;
 
 import com.google.common.base.Preconditions;
 
-import net.fouri.libs.bitutil.crypto.Hmac;
-import net.fouri.libs.bitutil.crypto.InMemoryPrivateKey;
-import net.fouri.libs.bitutil.crypto.PublicKey;
-import net.fouri.libs.bitutil.crypto.ec.Parameters;
-import net.fouri.libs.bitutil.util.BitUtils;
-import net.fouri.libs.bitutil.util.ByteReader;
-import net.fouri.libs.bitutil.util.ByteWriter;
+import io.nodehome.libs.bitutil.crypto.Hmac;
+import io.nodehome.libs.bitutil.crypto.InMemoryPrivateKey;
+import io.nodehome.libs.bitutil.crypto.PublicKey;
+import io.nodehome.libs.bitutil.crypto.ec.Parameters;
+import io.nodehome.libs.bitutil.util.BitUtils;
+import io.nodehome.libs.bitutil.util.ByteReader;
+import io.nodehome.libs.bitutil.util.ByteWriter;
 
 public class HdKeyNode
   implements Serializable

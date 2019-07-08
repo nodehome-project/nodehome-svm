@@ -15,14 +15,14 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
 
 import io.nodehome.cmm.service.GlobalProperties;
+import io.nodehome.libs.bitutil.model.NetConfig;
+import io.nodehome.libs.bitutil.model.NetConfig.NetworkType;
 import io.nodehome.svm.common.biz.ApiHelper;
 import io.nodehome.svm.common.biz.ChainInfoVO;
 import io.nodehome.svm.common.biz.CoinListVO;
 import io.nodehome.svm.common.biz.NAHostVO;
 import io.nodehome.svm.common.biz.ServiceWalletVO;
 import io.nodehome.svm.common.util.KeyManager;
-import net.fouri.libs.bitutil.model.NetConfig;
-import net.fouri.libs.bitutil.model.NetConfig.NetworkType;
 
 public class InitWebApplicationInitializer implements WebApplicationInitializer {
 
@@ -93,10 +93,10 @@ public class InitWebApplicationInitializer implements WebApplicationInitializer 
 
 		// set default net type
 		NetworkType emType = NetworkType.TESTNET; 
-		if((ChainInfoVO.getNetwork()).equalsIgnoreCase("main"))
-			emType = NetworkType.MAINNET;
-		else if((ChainInfoVO.getNetwork()).equals("debug"))
-			emType = NetworkType.DEBUGNET;
+		if((ChainInfoVO.getNetwork()).equalsIgnoreCase("biz"))
+			emType = NetworkType.BIZNET;
+		else if((ChainInfoVO.getNetwork()).equals("dev"))
+			emType = NetworkType.DEVNET;
 		NetConfig.setDefaultNet(emType);
 	}
 	

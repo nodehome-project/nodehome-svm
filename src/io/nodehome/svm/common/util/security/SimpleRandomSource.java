@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 
-import net.fouri.libs.bitutil.crypto.RandomSource;
+import io.nodehome.libs.bitutil.crypto.RandomSource;
 
 public class SimpleRandomSource implements RandomSource {
 

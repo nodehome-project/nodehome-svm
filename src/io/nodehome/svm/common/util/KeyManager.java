@@ -4,19 +4,17 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 import io.nodehome.cmm.service.GlobalProperties;
-import net.fouri.libs.bitutil.crypto.Base58;
-import net.fouri.libs.bitutil.crypto.HdKeyNode;
-import net.fouri.libs.bitutil.crypto.InMemoryPrivateKey;
-import net.fouri.libs.bitutil.crypto.Signature;
-import net.fouri.libs.bitutil.model.NetConfig;
-import net.fouri.libs.bitutil.model.NetConfig.NetworkType;
-import net.fouri.libs.bitutil.util.HashUtils;
-import net.fouri.libs.bitutil.util.Sha256Hash;
+import io.nodehome.libs.bitutil.crypto.Base58;
+import io.nodehome.libs.bitutil.crypto.HdKeyNode;
+import io.nodehome.libs.bitutil.crypto.InMemoryPrivateKey;
+import io.nodehome.libs.bitutil.crypto.Signature;
+import io.nodehome.libs.bitutil.model.NetConfig;
+import io.nodehome.libs.bitutil.util.HashUtils;
+import io.nodehome.libs.bitutil.util.Sha256Hash;
 
 public class KeyManager {
 
