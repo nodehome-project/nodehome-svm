@@ -96,7 +96,7 @@ public class SvmWalletController {
 		String walletID= (String)map.get("walletID");
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 
 		JSONObject joResult = null;
 		if(strPID.equals("")) strPID = KeyManager.PID;
@@ -149,7 +149,7 @@ public class SvmWalletController {
 		String walletID= (String)map.get("walletID");
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 
 		JSONObject joResult = null;
 		if(strPID.equals("")) strPID = KeyManager.PID;
@@ -187,57 +187,6 @@ public class SvmWalletController {
 			strOK = "{ \"result\":\"FAIL\", \"ref\":\""+joResult.get("ref").toString()+"\", \"ec\":\""+nCode+"\" }";
 		}
 		
-		servletResponse.setHeader("Access-Control-Allow-Origin", "*");
-		
-		return strOK;
-	}
-	
-	/*
-	 * Wallet chain registration
-	 */
-	@RequestMapping("/svm/wallet/setWalletInfo")
-	@ResponseBody
-	public String setWalletInfo(HttpServletRequest request, @RequestBody HashMap<Object,Object> map, ModelMap model, HttpServletResponse servletResponse) throws UnknownHostException, IOException {
-		String strOK = "{ \"result\":\"OK\" }";
-
-		String npid= (String)map.get("npid");
-		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
-		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
-		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		
-		if(arrArgs!=null) {
-			JSONObject joResult = null;
-
-			joResult = CPWalletUtil.getValue(serviceID, ApiHelper.EC_CHAIN, "setWalletInfo", npid, arrArgs.toArray(new String[0]), chainID );
-
-			long nCode = (Long)joResult.getOrDefault("ec",-1L);
-
-			if (nCode == 0) { // successful
-				// values to pass to the web
-				String strValue = joResult.get("value").toString();
-				System.out.println("strValue : "+strValue);
-
-				JSONParser jpTemp = new JSONParser();
-				JSONObject joInfo;
-				try {
-					joInfo = (JSONObject)jpTemp.parse(strValue);
-					if(strValue!=null) {
-						strValue = (String)joInfo.get("balance");
-					}
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}
-				System.out.println("strValue : "+strValue);
-				
-				strOK = "{ \"result\":\"OK\", \"nCode\":\""+nCode+"\", \"balance\":\""+strValue+"\" }";
-			} else { // fail
-				// values to pass to the web
-				String strValue = "";
-				strOK = "{ \"result\":\"FAIL\", \"nCode\":\""+nCode+"\", \"balance\":\""+strValue+"\" }";
-			}
-		}
-		
-		System.out.println("strOK : "+strOK);
 		servletResponse.setHeader("Access-Control-Allow-Origin", "*");
 		
 		return strOK;
@@ -321,7 +270,7 @@ public class SvmWalletController {
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		arrArgs.add("");
 		arrArgs.add("");
 		arrArgs.add("");
@@ -401,6 +350,56 @@ public class SvmWalletController {
 		JSONObject joResult = null;
 		if(arrArgs!=null) {
 			joResult = CPWalletUtil.getValue(serviceID, ApiHelper.EC_CHAIN, "reserveRegisterWallet", npid, arrArgs.toArray(new String[0]), chainID );
+
+			long nCode = (Long)joResult.getOrDefault("ec",-1L);
+			if (nCode == 0) { // successful
+				// values to pass to the web
+				String strValue = joResult.get("value").toString();
+				npid = joResult.get("npid").toString();
+				String reserve_id = "";
+				String fee = "";
+
+				JSONParser jpTemp = new JSONParser();
+				JSONObject joInfo;
+				try {
+					joInfo = (JSONObject)jpTemp.parse(strValue);
+					if(strValue!=null) {
+						reserve_id = (String)joInfo.get("reserve_id");
+						fee = (String)joInfo.get("fee");
+					}
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				System.out.println("strValue : "+strValue);
+				
+				strOK = "{ \"result\":\"OK\", \"fee\":\""+fee+"\", \"reserve_id\":\""+reserve_id+"\", \"ec\":\""+nCode+"\", \"npid\":\""+npid+"\" }";
+			} else { // fail
+				strOK = "{ \"result\":\"FAIL\", \"fee\":\"\", \"reserve_id\":\"\", \"ec\":\""+nCode+"\", \"npid\":\""+npid+"\" }";
+			}
+		}
+		
+		System.out.println("strOK : "+strOK);
+		
+		return strOK.toString();
+	}
+
+	/*
+	 * Register wallet information in the block chain.
+	 */
+	@RequestMapping("/svm/wallet/registerWallet")
+	@ResponseBody
+	public String registerWallet(HttpServletRequest request, @RequestBody HashMap<Object,Object> map, ModelMap model, HttpServletResponse servletResponse) throws UnknownHostException, IOException {
+		String strOK = "{ \"result\":\"OK\" }";
+
+		//String strPID = null;
+		String npid= StringUtil.nvl((String)map.get("npid"));
+		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
+		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
+		String chainID = StringUtil.nvl(map.get("chainID"),"");
+
+		JSONObject joResult = null;
+		if(arrArgs!=null) {
+			joResult = CPWalletUtil.getValue(serviceID, ApiHelper.EC_CHAIN, "registerWallet", npid, arrArgs.toArray(new String[0]), chainID );
 
 			long nCode = (Long)joResult.getOrDefault("ec",-1L);
 			if (nCode == 0) { // successful

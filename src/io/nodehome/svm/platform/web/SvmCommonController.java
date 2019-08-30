@@ -71,7 +71,7 @@ public class SvmCommonController {
 		    //System.out.println("send_packet strContents : "+strContents.toString());
 			joReq = (JSONObject)jpTemp.parse(strContents);
 		    
-			String netType = StringUtil.nvl(joReq.get("netType"),"testnet");
+			String netType = StringUtil.nvl(joReq.get("netType"),"test");
 			String chainID = StringUtil.nvl(joReq.get("chainID"),"");
 			System.out.println("querySendPacket chainID : "+chainID);
 			
@@ -119,7 +119,7 @@ public class SvmCommonController {
 		String npid= (String)map.get("npid");
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		if(strCType==null || strCType.equals("")) strCType = ApiHelper.EC_CHAIN;
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
 
 		String strValue = "";
@@ -187,7 +187,7 @@ public class SvmCommonController {
 		String npid= (String)map.get("npid");
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
 
 		if(arrArgs!=null) {
@@ -285,7 +285,7 @@ public class SvmCommonController {
 	public String getServiceInfo(HttpServletRequest request, @RequestBody HashMap<Object,Object> map, ModelMap model, HttpServletResponse servletResponse) throws UnknownHostException, IOException {
 		String strOK = "{ \"result\":\"OK\" }";
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
 		
 		JSONObject joResult = CPWalletUtil.getValueManager(serviceID, ApiHelper.EC_CHAIN, "getServiceInfo", new String[] {"PID","10000",serviceID,"","",""} , chainID, netType);
@@ -331,7 +331,7 @@ public class SvmCommonController {
 			// values to pass to the web
 			strValue = joResult.get("value").toString();
 		} else { // fail
-			strValue = "{ \"result\":\"FAIL\"}";
+			strValue = "{ \"ref\":\"FAIL\"}";
 		}
 
 		return strValue;

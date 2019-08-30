@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -44,7 +42,7 @@ public class SvmTokenController {
 		String tokenId= StringUtil.nvl((String)map.get("tokenId"));
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 
 		JSONObject joResult = null;
 		if(strPID.equals("")) strPID = KeyManager.PID;
@@ -83,7 +81,7 @@ public class SvmTokenController {
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		arrArgs.add("");
 		arrArgs.add("");
 		arrArgs.add("");

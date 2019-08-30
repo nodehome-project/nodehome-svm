@@ -160,7 +160,7 @@ public class SvmContentController {
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		
 		if(arrArgs!=null) {
 			JSONObject joResult = null;
@@ -286,13 +286,13 @@ public class SvmContentController {
 		
 		String npid= (String)map.get("npid");
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
-		String serviceId = StringUtil.nvl(map.get("serviceId"),GlobalProperties.getProperty("project_serviceid"));
+		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceid"));
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
 		
 		if(arrArgs!=null) {
 			JSONObject joResult = null;
 
-			joResult = CPWalletUtil.getValue(serviceId, ApiHelper.EC_CHAIN, "reserveSetContentOwner", npid, arrArgs.toArray(new String[0]), chainID );
+			joResult = CPWalletUtil.getValue(serviceID, ApiHelper.EC_CHAIN, "setContentOwner", npid, arrArgs.toArray(new String[0]), chainID );
 			
 			long nCode = (Long)joResult.getOrDefault("ec",-1L);
 			if (nCode == 0) {
@@ -351,7 +351,7 @@ public class SvmContentController {
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		if(map!=null) map.remove("serviceID");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 
 	    String JSONInput = new JSONObject(map).toString();
 	    if(JSONInput==null || JSONInput.equals("")) JSONInput = "{}";
@@ -391,7 +391,7 @@ public class SvmContentController {
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		arrArgs.add("");
 		arrArgs.add("");
 		arrArgs.add("");
@@ -430,7 +430,7 @@ public class SvmContentController {
 		String serviceID = StringUtil.nvl(map.get("serviceID"),GlobalProperties.getProperty("project_serviceID"));
 		List<String> arrArgs=(ArrayList<String>)map.get("parameterArgs");
 		String chainID = StringUtil.nvl(map.get("chainID"),"");
-		String netType = StringUtil.nvl(map.get("netType"),"testnet");
+		String netType = StringUtil.nvl(map.get("netType"),"test");
 		arrArgs.add("");
 		arrArgs.add("");
 		arrArgs.add("");

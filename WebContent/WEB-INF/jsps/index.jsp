@@ -178,49 +178,6 @@ System.out.println("wid : "+strAWID);
 			return rtnBalance;
 		}
 		
-		// Wallet chain registration
-	    function setWalletInfo() {	    	
-			var result = confirm ('<spring:message code="wallet.msg.addchain" />');
-			if (result) {
-				var sWNM = j_curWNM;
-				var pWalletId = j_curWID;
-				var sNonce = "";	// nonce string
-				var sSig = "";		// signature string
-				var sNpid = "";		// NA connect id
-				var rtnBalance = 0;	// Balance
-				
-				// ************ step1 : get Nonce / SVM API
-				var sQuery = {"pid":"PID", "ver":"10000","netType":j_curNetId,"chainID":j_chainID, "nType":"query"};
-				var retData = WSI_callJsonAPI("/svm/common/getNonce", sQuery);
-				if(retData['result'] == "OK") {
-					sNonce = retData['nonce'];
-					sNpid = retData['npid'];
-				} else {
-					return false;
-				}
-				
-				// ************ step2 : get Signature / S-T API
-				sQuery = ["PID","10000",sNonce];
-				var sigRes = AWI_getSignature(pWalletId, sQuery, "invoke", "setWalletInfo");
-				if(sigRes['result']=="OK") {
-					sSig = sigRes['signature_key'];	
-					
-					// ************ step3 : setWalletInfo / SVM API
-					sQuery = {"npid":sNpid,"netType":j_curNetId,"chainID":j_chainID, "parameterArgs" : ["PID","10000",sWNM,"100000000000","wallet memo",sNonce,sSig,pWalletId]};
-					retData = WSI_callJsonAPI("/svm/wallet/setWalletInfo", sQuery);
-
-					if(retData['result'] == "OK") {
-						//rtnBalance = retData['balance'];
-					} else {
-						return '';
-					}
-				}
-				return rtnBalance;
-			} else {
-				
-			}			
-		}
-		
 	    // backup
 	    function setBackUpFunc() {
 			var pWalletId = j_curWID;			
@@ -395,7 +352,6 @@ System.out.println("wid : "+strAWID);
                   <spring:message code="wallet.text.walletname" /> : <span id="my_wallet_name"></span><br />
                   <spring:message code="wallet.text.balance" /> : <span id="my_wallet_balance"></span><br />
                   <button type="button" class="btn btn-primary btn-sm" onclick="javascript:showQRCode();"><spring:message code="user.text.qrzoom" /></button>
-                  <!-- <button type="button" class="btn btn-primary btn-sm" onclick="javascript:setWalletInfo();"><spring:message code="user.button.addWallet" /></button> -->
                   <button type="button" class="btn btn-primary btn-sm" onclick="javascript:setBackUpFunc();"><spring:message code="user.text.backup" /></button>
                   <button type="button" class="btn btn-primary btn-sm" onclick="javascript:setRestoreFunc();"><spring:message code="user.text.restore" /></button>
                   </h4>
